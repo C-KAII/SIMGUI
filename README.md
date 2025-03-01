@@ -86,7 +86,7 @@ imgui_app.exe
 |-------------|----------|
 | **Mouse Click** | Press buttons, interact with sliders |
 | **Arrow Keys** | Adjust sliders, move text cursor |
-| **Shift / Ctrl ** | Enables shift / ctrl key modifications |
+| **Shift / Ctrl** | Enables shift / ctrl key modifications |
 | **Tab** | Tab selection through widgets |
 | **Enter** | Simulate mouse click on tab selected items |
 | **Escape** | Exit program |
@@ -103,6 +103,7 @@ imgui_app.exe
 
 ## **Author**
 **Kobi Chambers**
+
 Check out my website - https://www.kobichambers.com/
 
 Feel free to fork and contribute!
