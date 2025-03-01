@@ -3,6 +3,8 @@
 #include "Renderer.h"
 #include <SDL2/SDL.h>
 
+constexpr int OUTLINE_PADDING = 2;
+
 struct UIState;
 
 class Widget {

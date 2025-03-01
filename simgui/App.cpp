@@ -12,37 +12,19 @@
 #define GEN_ID (__LINE__)
 #endif
 
-constexpr int SCREEN_WIDTH = 640;
-constexpr int SCREEN_HEIGHT = 480;
+constexpr int SCREEN_WIDTH = 1080;
+constexpr int SCREEN_HEIGHT = 720;
 
 bool App::init() {
-  if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-    std::cerr << "Unable to initialize SDL: " << SDL_GetError() << std::endl;
+  if (!m_renderer.init("SIMGUI", SCREEN_WIDTH, SCREEN_HEIGHT)) {
     return false;
   }
 
-  atexit(SDL_Quit);
-
-  m_window = SDL_CreateWindow("SDL2 Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-  if (!m_window) {
-    std::cerr << "Unable to create window: " << SDL_GetError() << std::endl;
-    SDL_Quit();
+  if (!m_renderer.initFont("assets/fonts/OpenDyslexicMono-Regular.otf", 12)) {
     return false;
   }
 
-  m_renderer = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED);
-  if (!m_renderer) {
-    std::cerr << "Unable to create renderer: " << SDL_GetError() << std::endl;
-    SDL_DestroyWindow(m_window);
-    SDL_Quit();
-    return false;
-  }
-  m_renderWrapper = Renderer(m_renderer);
-
-  if (!m_renderWrapper.initFont("assets/fonts/OpenDyslexicMono-Regular.otf", 12)) {
-    return false;
-  }
-
+  //atexit(SDL_Quit);
   SDL_StartTextInput();
   return true;
 }
@@ -59,16 +41,12 @@ void App::run() {
       m_uiState.needsUpdate = false;
     }
     render();
-
   }
 }
 
 void App::cleanUp() {
-  SDL_DestroyRenderer(m_renderer);
-  SDL_DestroyWindow(m_window);
+  m_renderer.cleanUp();
   SDL_StopTextInput();
-  m_renderWrapper.cleanUp();
-  SDL_Quit();
 }
 
 // private
@@ -128,8 +106,8 @@ void App::addWidgets() {
   m_layout.addWidget(std::make_unique<Slider>(GEN_ID, 0, 0, 16, 100, 0, 255, m_blueValue));
 
   // Text Fields
-  m_layout.addWidget(std::make_unique<TextField>(GEN_ID, 0, 0, 200, m_renderWrapper.fontH));
-  m_layout.addWidget(std::make_unique<TextField>(GEN_ID, 0, 0, 200, m_renderWrapper.fontH));
+  m_layout.addWidget(std::make_unique<TextField>(GEN_ID, 0, 0, 200, m_renderer.getFontHeight()));
+  m_layout.addWidget(std::make_unique<TextField>(GEN_ID, 0, 0, 200, m_renderer.getFontHeight()));
 
   m_layout.applyLayout();
 }
@@ -149,18 +127,22 @@ void App::imguiFinish() {
 }
 
 void App::render() {
-  SDL_SetRenderDrawColor(m_renderer, m_redValue, m_greenValue, m_blueValue, 255);
-  SDL_RenderClear(m_renderer);
+  m_renderer.clear({
+    static_cast<unsigned char>(m_redValue),
+    static_cast<unsigned char>(m_greenValue),
+    static_cast<unsigned char>(m_blueValue),
+    255
+    });
 
   imguiPrepare();
 
   for (auto& widget : m_layout.getWidgets()) {
-    widget->update(m_renderWrapper, m_uiState);
-    widget->render(m_renderWrapper, m_uiState);
+    widget->update(m_renderer, m_uiState);
+    widget->render(m_renderer, m_uiState);
   }
 
   imguiFinish();
 
-  SDL_RenderPresent(m_renderer);
+  m_renderer.present();
   SDL_Delay(10);
 }

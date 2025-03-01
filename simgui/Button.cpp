@@ -74,7 +74,11 @@ void Button::update(Renderer& renderer, UIState& uiState) {
 void Button::render(Renderer& renderer, const UIState& uiState) {
   // If we have keyboard focus, show it
   if (uiState.kbdItem == m_id) {
-    renderer.drawRect(m_x - 4, m_y - 4, m_width + 8, m_height + 8, { 255, 0, 0, 255 });
+    renderer.drawRect(
+      m_x - OUTLINE_PADDING, m_y - OUTLINE_PADDING,
+      m_width + (OUTLINE_PADDING * 2), m_height + (OUTLINE_PADDING * 2),
+      {255, 0, 0, 255}
+    );
   }
 
   // Render button

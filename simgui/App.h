@@ -4,7 +4,6 @@
 #include "LayoutManager.h"
 #include "UIState.h"
 #include <SDL2/SDL.h>
-#include <string>
 
 class App {
 public:
@@ -22,9 +21,7 @@ private:
   void imguiFinish();
   void render();
 
-  SDL_Window* m_window{ nullptr };
-  SDL_Renderer* m_renderer{ nullptr };
-  Renderer m_renderWrapper{ };
+  Renderer m_renderer{ };
 
   LayoutManager m_layout;
   

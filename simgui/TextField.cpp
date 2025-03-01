@@ -11,8 +11,6 @@ TextField::TextField(int id, int x, int y, int width, int height) {
 }
 
 void TextField::update(Renderer& renderer, UIState& uiState) {
-  //m_height = static_cast<int>(m_lines.size()) * (renderer.fontH + 4);
-
   // Check for hotness
   if (uiState.regionHit(m_x, m_y, m_width, m_height)) {
     uiState.hotItem = m_id;
@@ -52,7 +50,7 @@ void TextField::update(Renderer& renderer, UIState& uiState) {
         m_lines[m_cursorY].erase(m_lines[m_cursorY].begin() + m_cursorX);
       } else if (m_cursorY > 0) {
         // Merge with previous line if at start of current line
-        m_cursorX = m_lines[m_cursorY - 1].size();
+        m_cursorX = static_cast<int>(m_lines[m_cursorY - 1].size());
         m_lines[m_cursorY - 1] += m_lines[m_cursorY];
         m_lines.erase(m_lines.begin() + m_cursorY);
         m_cursorY--;
@@ -74,7 +72,7 @@ void TextField::update(Renderer& renderer, UIState& uiState) {
         m_cursorX--;
       } else if (m_cursorY > 0) {
         m_cursorY--;
-        m_cursorX = m_lines[m_cursorY].size();
+        m_cursorX = static_cast<int>(m_lines[m_cursorY].size());
       }
       break;
 
@@ -91,7 +89,7 @@ void TextField::update(Renderer& renderer, UIState& uiState) {
 
   // Process text input
   if (uiState.kbdItem == m_id && uiState.keyEntered >= 32 && uiState.keyEntered <= 126) {
-    if (m_lines[m_cursorY].size() < (m_width / renderer.fontW)) {
+    if (m_lines[m_cursorY].size() < (m_width / renderer.getFontWidth())) {
       m_lines[m_cursorY].insert(m_cursorX, 1, static_cast<char>(uiState.keyEntered));
       m_cursorX++;
     } else {
@@ -103,14 +101,18 @@ void TextField::update(Renderer& renderer, UIState& uiState) {
     }
   }
 
-  m_height = static_cast<int>(m_lines.size()) * (renderer.fontH + 4);
+  m_height = static_cast<int>(m_lines.size()) * (renderer.getFontHeight() + 4);
   uiState.lastWidget = m_id;
 }
 
 void TextField::render(Renderer& renderer, const UIState& uiState) {
   // Draw outline if focused
   if (uiState.kbdItem == m_id) {
-    renderer.drawRect(m_x - 4, m_y - 4, m_width + 8, m_height + 8, {255, 0, 0, 255});
+    renderer.drawRect(
+      m_x - OUTLINE_PADDING, m_y - OUTLINE_PADDING,
+      m_width + (OUTLINE_PADDING * 2), m_height + (OUTLINE_PADDING * 2),
+      {255, 0, 0, 255}
+    );
   }
 
   // Draw field background
@@ -118,19 +120,21 @@ void TextField::render(Renderer& renderer, const UIState& uiState) {
   if (uiState.hotItem == m_id) {
     bgColor = { 255, 255, 255, 255 };  // Lighter when active
   }
-  renderer.drawRect(m_x - 2, m_y - 2, m_width + 4, m_height + 4, bgColor);
+  renderer.drawRect(m_x, m_y, m_width, m_height, bgColor);
 
   // Render multi-line text
   SDL_Color textColor = { 0, 0, 0, 255 };
-  int lineSpacing = renderer.fontH + 4;
-  for (size_t i = 0; i < m_lines.size(); i++) {
+  int lineSpacing = renderer.getFontHeight() + 4;
+  for (int i = 0; i < static_cast<int>(m_lines.size()); i++) {
     renderer.drawText(m_lines[i], m_x + 4, m_y + 4 + i * lineSpacing, textColor);
   }
-  //renderer.drawText(m_text.empty() ? "Type here..." : m_text, m_x + 4, m_y + 4, textColor);
+  if (m_lines[0].empty() && m_lines.size() <= 1) {
+    renderer.drawText("Type here...", m_x + 4, m_y + 4, textColor);
+  }
 
   // Render blinking cursor
   if (uiState.kbdItem == m_id && (SDL_GetTicks() >> 8) & 1) {
-    int cursorOffsetX = m_cursorX * renderer.fontW;
+    int cursorOffsetX = m_cursorX * renderer.getFontWidth();
     int cursorOffsetY = m_cursorY * lineSpacing;
     renderer.drawText("_", m_x + 4 + cursorOffsetX, m_y + 4 + cursorOffsetY, textColor);
   }
