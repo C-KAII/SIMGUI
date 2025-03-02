@@ -12,7 +12,7 @@ public:
   Widget() = default;
   virtual ~Widget() = default;
 
-  SDL_Rect getDims() { return { m_x, m_y, m_width, m_height }; }
+  SDL_Rect getRect() { return { m_x, m_y, m_width, m_height }; }
 
   void setPosition(int x, int y) {
     m_x = x;
@@ -24,22 +24,27 @@ public:
     m_height = height;
   }
 
-  void setDims(int x, int y, int width, int height) {
+  void setRect(int x, int y, int width, int height) {
     m_x = x;
     m_y = y;
     m_width = width;
     m_height = height;
   }
 
-  void setDims(SDL_Rect dims) {
-    m_x = dims.x;
-    m_y = dims.y;
-    m_width = dims.w;
-    m_height = dims.h;
+  void setRect(SDL_Rect rect) {
+    m_x = rect.x;
+    m_y = rect.y;
+    m_width = rect.w;
+    m_height = rect.h;
   }
 
   virtual void update(Renderer& renderer, UIState& uiState) = 0;
   virtual void render(Renderer& renderer, const UIState& uiState) = 0;
+
+  void renderDebug(Renderer& renderer) const {
+    renderer.drawRect(m_x, m_y, m_width, m_height, { 255, 255, 255, 50 });
+    renderer.drawText(std::to_string(m_id), m_x + 2, m_y + 2, { 0, 0, 0, 255 });
+  }
 
 protected:
   int m_id{ 0 };

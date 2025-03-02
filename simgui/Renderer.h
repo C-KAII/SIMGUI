@@ -53,11 +53,17 @@ public:
     }
 
     TTF_SizeUTF8(m_font, "A", &m_fontW, &m_fontH);
+    SDL_StartTextInput();
     return true;
   }
 
   void drawRect(int x, int y, int w, int h, SDL_Color color) {
     SDL_Rect rect{ x, y, w, h };
+    SDL_SetRenderDrawColor(m_renderer, color.r, color.g, color.b, color.a);
+    SDL_RenderFillRect(m_renderer, &rect);
+  }
+
+  void drawRect(SDL_Rect rect, SDL_Color color) {
     SDL_SetRenderDrawColor(m_renderer, color.r, color.g, color.b, color.a);
     SDL_RenderFillRect(m_renderer, &rect);
   }

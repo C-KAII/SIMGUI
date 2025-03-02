@@ -29,7 +29,7 @@ struct UIState {
 
           bool flag = false;
           for (auto& widget : layout.getWidgets()) {
-            if (regionHit(widget->getDims())) {
+            if (regionHit(widget->getRect())) {
               flag = true;
               break;
             }
@@ -44,16 +44,23 @@ struct UIState {
         keyEntered = event.key.keysym.sym;
         keyMod = event.key.keysym.mod;
 
-        if (keyEntered == SDLK_TAB && kbdItem == -1) {
-          keyEntered = 0;
+        if (event.key.keysym.sym == SDLK_TAB && kbdItem == -1) {
           kbdItem = 0;
+          keyEntered = 0;
+        }
+
+        if (event.key.keysym.sym == SDLK_LCTRL || event.key.keysym.sym == SDLK_RCTRL) {
+          layout.toggleDebug(true);
         }
         break;
 
       case SDL_KEYUP:
-        switch (event.key.keysym.sym) {
-        case SDLK_ESCAPE:
+        if (event.key.keysym.sym == SDLK_ESCAPE) {
           return false;
+        }
+
+        if (event.key.keysym.sym == SDLK_LCTRL || event.key.keysym.sym == SDLK_RCTRL) {
+          layout.toggleDebug(false);
         }
         break;
 
@@ -74,26 +81,14 @@ struct UIState {
     return true;
   }
 
-  bool regionHit(SDL_Rect dims) const {
+  bool regionHit(SDL_Rect rect) const {
     if (
-      mouseX < dims.x || mouseY < dims.y ||
-      mouseX >= dims.x + dims.w || mouseY >= dims.y + dims.h
+      mouseX < rect.x || mouseY < rect.y ||
+      mouseX >= rect.x + rect.w || mouseY >= rect.y + rect.h
       ) {
       return false;
     }
     return true;
-  }
-
-  void resetFrameState() {
-
-  }
-
-  void updateMouse(int x, int y, bool down) {
-
-  }
-
-  void processKey(int key, int mod) {
-
   }
 
   int mouseX{ 0 };

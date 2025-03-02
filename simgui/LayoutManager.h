@@ -28,6 +28,10 @@ public:
 
   bool needsUpdate() const { return m_needsUpdate; }
 
+  bool isDebugMode() const { return debugMode; }
+
+  void toggleDebug(bool flag) { debugMode = flag; }
+
   int getNumWidgets() const { return static_cast<int>(m_widgets.size()); }
 
   void addWidget(std::unique_ptr<Widget> widget) {
@@ -45,17 +49,17 @@ public:
     m_rowMaxHeights.push_back(0);
 
     for (auto& widget : m_widgets) {
-      SDL_Rect dims = widget->getDims();
+      SDL_Rect rect = widget->getRect();
 
       switch (m_layoutType) {
       case LayoutType::Vertical:
         widget->setPosition(m_xOffset, currentY);
-        currentY += dims.h + m_spacing;
+        currentY += rect.h + m_spacing;
         break;
 
       case LayoutType::Horizontal:
         widget->setPosition(currentX, m_yOffset);
-        currentX += dims.w + m_spacing;
+        currentX += rect.w + m_spacing;
         break;
 
       case LayoutType::Grid:
@@ -64,7 +68,7 @@ public:
         if (rowCount >= m_rowMaxHeights.size()) {
           m_rowMaxHeights.push_back(0);
         }
-        m_rowMaxHeights[rowCount] = std::max(m_rowMaxHeights[rowCount], dims.h);
+        m_rowMaxHeights[rowCount] = std::max(m_rowMaxHeights[rowCount], rect.h);
 
         colCount++;
         if (colCount >= m_columns) {
@@ -73,7 +77,7 @@ public:
           currentY += m_rowMaxHeights[rowCount] + m_spacing;
           rowCount++;
         } else {
-          currentX += dims.w + m_spacing;
+          currentX += rect.w + m_spacing;
         }
         break;
       }
@@ -89,6 +93,7 @@ private:
   int m_spacing;
   LayoutType m_layoutType;
   bool m_needsUpdate{ false };
+  bool debugMode{ false };
 
   // Grid-specific
   int m_columns{ 2 };

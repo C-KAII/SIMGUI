@@ -24,7 +24,6 @@ bool App::init() {
     return false;
   }
 
-  SDL_StartTextInput();
   return true;
 }
 
@@ -133,6 +132,12 @@ void App::render() {
   for (auto& widget : m_layout.getWidgets()) {
     widget->update(m_renderer, m_uiState);
     widget->render(m_renderer, m_uiState);
+  }
+
+  if (m_layout.isDebugMode()) {
+    for (auto& widget : m_layout.getWidgets()) {
+      widget->renderDebug(m_renderer);
+    }
   }
 
   imguiFinish();
