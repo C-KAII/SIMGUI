@@ -24,7 +24,6 @@ bool App::init() {
     return false;
   }
 
-  //atexit(SDL_Quit);
   SDL_StartTextInput();
   return true;
 }
@@ -42,11 +41,6 @@ void App::run() {
     }
     render();
   }
-}
-
-void App::cleanUp() {
-  m_renderer.cleanUp();
-  SDL_StopTextInput();
 }
 
 // private

@@ -5,9 +5,8 @@
 #include <memory>
 
 struct UIState {
-  UIState() {}
-
-  ~UIState() {}
+  UIState() = default;
+  ~UIState() = default;
 
   bool handleEvents(LayoutManager& layout) {
     SDL_Event event;

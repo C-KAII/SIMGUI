@@ -9,7 +9,14 @@ class Renderer {
 public:
   Renderer() = default;
 
-  ~Renderer() = default;
+  ~Renderer() {
+    SDL_StopTextInput();
+    if (m_font) { TTF_CloseFont(m_font); }
+    if (m_renderer) { SDL_DestroyRenderer(m_renderer); }
+    if (m_window) { SDL_DestroyWindow(m_window); }
+    TTF_Quit();
+    SDL_Quit();
+  }
 
   bool init(const std::string& title, int width, int height) {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -92,14 +99,6 @@ public:
   }
 
   void present() { SDL_RenderPresent(m_renderer); }
-
-  void cleanUp() {
-    if (m_font) { TTF_CloseFont(m_font); }
-    if (m_renderer) { SDL_DestroyRenderer(m_renderer); }
-    if (m_window) { SDL_DestroyWindow(m_window); }
-    TTF_Quit();
-    SDL_Quit();
-  }
 
   SDL_Renderer* getRenderer() { return m_renderer; }
 

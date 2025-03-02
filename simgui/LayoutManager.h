@@ -10,6 +10,8 @@ public:
   LayoutManager(int startX = 10, int startY = 10, int spacing = 5, LayoutType type = LayoutType::Vertical)
     : m_xOffset(startX), m_yOffset(startY), m_spacing(spacing), m_layoutType(type) {}
 
+  ~LayoutManager() = default;
+
   void setLayoutType(LayoutType type) {
     m_layoutType = type;
     m_needsUpdate = true;

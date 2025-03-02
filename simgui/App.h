@@ -12,7 +12,6 @@ public:
 
   bool init();
   void run();
-  void cleanUp();
 
 private:
   void addWidgets();

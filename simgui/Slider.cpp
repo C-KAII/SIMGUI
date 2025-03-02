@@ -2,7 +2,7 @@
 #include "Slider.h"
 
 Slider::Slider(int id, int x, int y, int width, int height, int minValue, int maxValue, int& valueRef)
-: m_minValue(minValue), m_maxValue(maxValue), m_value(valueRef) {
+  : m_minValue(minValue), m_maxValue(maxValue), m_value(valueRef) {
   m_id = id;
   m_x = x;
   m_y = y;

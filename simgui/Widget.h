@@ -9,8 +9,8 @@ struct UIState;
 
 class Widget {
 public:
-  Widget() {}
-  virtual ~Widget() {}
+  Widget() = default;
+  virtual ~Widget() = default;
 
   SDL_Rect getDims() { return { m_x, m_y, m_width, m_height }; }
 

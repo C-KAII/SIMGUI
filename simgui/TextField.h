@@ -17,7 +17,6 @@ public:
 
 private:
   bool m_isActive{ false };
-  //std::string m_text{ "" };
   std::vector<std::string> m_lines;
   int m_cursorX{ 0 }; // X position of cursor
   int m_cursorY{ 0 }; // Y position of cursor (line number)
