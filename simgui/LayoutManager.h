@@ -5,17 +5,10 @@
 
 class LayoutManager {
 public:
-  enum class LayoutType { Vertical, Horizontal, Grid };
-
-  LayoutManager(int startX = 10, int startY = 10, int spacing = 5, LayoutType type = LayoutType::Vertical)
-    : m_xOffset(startX), m_yOffset(startY), m_spacing(spacing), m_layoutType(type) {}
+  LayoutManager(int startX = 10, int startY = 10, int padding = 4)
+    : m_xOffset(startX), m_yOffset(startY), m_padding(padding) {}
 
   ~LayoutManager() = default;
-
-  void setLayoutType(LayoutType type) {
-    m_layoutType = type;
-    m_needsUpdate = true;
-  }
   
   void setNumColumns (int columns) {
     if (columns >= 1) {
@@ -26,17 +19,44 @@ public:
 
   int getNumColumns() const { return m_columns; }
 
-  bool needsUpdate() const { return m_needsUpdate; }
-
-  bool isDebugMode() const { return debugMode; }
-
-  void toggleDebug(bool flag) { debugMode = flag; }
-
   int getNumWidgets() const { return static_cast<int>(m_widgets.size()); }
+
+  int getRowHeight(int index) const { return m_rowMaxHeights[index]; }
+
+  bool needsUpdate() const { return m_needsUpdate; }
 
   void addWidget(std::unique_ptr<Widget> widget) {
     m_widgets.push_back(std::move(widget));
     m_needsUpdate = true;
+  }
+
+  void reorderWidget(Widget* dragged, Widget* target, bool insertBefore) {
+    auto& widgets = m_widgets;
+
+    // Find the index of dragged and target widgets
+    int draggedIndex = -1, targetIndex = -1;
+    for (int i = 0; i < widgets.size(); ++i) {
+      if (widgets[i].get() == dragged) { draggedIndex = i; }
+      if (widgets[i].get() == target) { targetIndex = i; }
+    }
+
+    if (draggedIndex == -1 || targetIndex == -1 || draggedIndex == targetIndex) {
+      return; // Invalid indices, no change needed
+    }
+
+    // Extract the dragged widget safely
+    std::unique_ptr<Widget> draggedWidget = std::move(widgets[draggedIndex]);
+    widgets.erase(widgets.begin() + draggedIndex);
+
+    // Adjust target index if dragged was before target (since we erased one element)
+    if (draggedIndex < targetIndex) { targetIndex--; }
+
+    // Insert dragged widget at new position
+    if (insertBefore) {
+      widgets.insert(widgets.begin() + targetIndex, std::move(draggedWidget));
+    } else {
+      widgets.insert(widgets.begin() + targetIndex + 1, std::move(draggedWidget));
+    }
   }
 
   void applyLayout() {
@@ -50,19 +70,6 @@ public:
 
     for (auto& widget : m_widgets) {
       SDL_Rect rect = widget->getRect();
-
-      switch (m_layoutType) {
-      case LayoutType::Vertical:
-        widget->setPosition(m_xOffset, currentY);
-        currentY += rect.h + m_spacing;
-        break;
-
-      case LayoutType::Horizontal:
-        widget->setPosition(currentX, m_yOffset);
-        currentX += rect.w + m_spacing;
-        break;
-
-      case LayoutType::Grid:
         widget->setPosition(currentX, currentY);
 
         if (rowCount >= m_rowMaxHeights.size()) {
@@ -74,13 +81,11 @@ public:
         if (colCount >= m_columns) {
           colCount = 0;
           currentX = m_xOffset;
-          currentY += m_rowMaxHeights[rowCount] + m_spacing;
+          currentY += m_rowMaxHeights[rowCount] + m_padding;
           rowCount++;
         } else {
-          currentX += rect.w + m_spacing;
+          currentX += rect.w + m_padding;
         }
-        break;
-      }
     }
     m_needsUpdate = false;
   }
@@ -90,12 +95,9 @@ public:
 private:
   int m_xOffset;
   int m_yOffset;
-  int m_spacing;
-  LayoutType m_layoutType;
+  int m_padding;
   bool m_needsUpdate{ false };
-  bool debugMode{ false };
 
-  // Grid-specific
   int m_columns{ 2 };
   std::vector<int> m_rowMaxHeights{ 0 };
 

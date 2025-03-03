@@ -18,7 +18,9 @@ private:
 
   void imguiPrepare();
   void imguiFinish();
+
   void render();
+  void renderDebugGrid();
 
   Renderer m_renderer{ };
 

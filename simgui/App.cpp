@@ -32,7 +32,7 @@ void App::run() {
 
   m_running = true;
   while (m_running) {
-    m_running = m_uiState.handleEvents(m_layout);
+    m_running = m_uiState.handleEvents(m_layout, m_renderer);
 
     if (m_layout.needsUpdate() || m_uiState.needsUpdate) {
       m_layout.applyLayout();
@@ -45,9 +45,6 @@ void App::run() {
 // private
 
 void App::addWidgets() {
-  m_layout.setLayoutType(LayoutManager::LayoutType::Grid);
-  m_layout.setNumColumns(2);
-
   // Buttons
   m_layout.addWidget(std::make_unique<Button>(
     GEN_ID, 0, 0, 100, 50,
@@ -129,14 +126,16 @@ void App::render() {
 
   imguiPrepare();
 
-  for (auto& widget : m_layout.getWidgets()) {
-    widget->update(m_renderer, m_uiState);
-    widget->render(m_renderer, m_uiState);
-  }
-
-  if (m_layout.isDebugMode()) {
+  if (m_uiState.debugMode) {
+    //renderDebugGrid();
     for (auto& widget : m_layout.getWidgets()) {
       widget->renderDebug(m_renderer);
+    }
+
+  } else {
+    for (auto& widget : m_layout.getWidgets()) {
+      widget->update(m_renderer, m_uiState);
+      widget->render(m_renderer, m_uiState);
     }
   }
 
@@ -145,3 +144,31 @@ void App::render() {
   m_renderer.present();
   SDL_Delay(10);
 }
+
+//void App::renderDebugGrid() {
+//  int cols = m_layout.getNumColumns();
+//  int row = 0;
+//  int padding = 4;
+//
+//  const auto& widgets = m_layout.getWidgets();
+//  for (int i = 0; i < widgets.size(); i++) {
+//    SDL_Rect rect = widgets[i]->getRect();
+//
+//    // Tile border
+//    m_renderer.drawRect(
+//      rect.x - (padding / 2), rect.y - (padding / 2),
+//      rect.w + padding, m_layout.getRowHeight(row) + padding,
+//      { 0, 0, 0, 100 }
+//    );
+//    // Tile
+//    m_renderer.drawRect(
+//      rect.x - (padding / 4), rect.y - (padding / 4),
+//      rect.w + (padding / 2), m_layout.getRowHeight(row) + (padding / 2),
+//      { 0, 255, 0, 100 }
+//    );
+//
+//    if (i - (row * cols) == cols - 1) {
+//      row++;
+//    }
+//  }
+//}

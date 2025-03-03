@@ -24,13 +24,21 @@ public:
       return false;
     }
 
-    m_window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
+    m_window = SDL_CreateWindow(
+      title.c_str(),
+      SDL_WINDOWPOS_CENTERED,
+      SDL_WINDOWPOS_CENTERED,
+      width,
+      height,
+      SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE
+    );
+
     if (!m_window) {
       std::cerr << "Window Creation Failed: " << SDL_GetError() << std::endl;
       return false;
     }
 
-    m_renderer = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED);
+    m_renderer = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (!m_renderer) {
       std::cerr << "Renderer Creation Failed: " << SDL_GetError() << std::endl;
       SDL_DestroyWindow(m_window);
@@ -110,6 +118,12 @@ public:
 
   int getFontWidth() const { return m_fontW; }
   int getFontHeight() const { return m_fontH; }
+
+  void updateWindowSize(int width, int height) {
+    if (m_renderer) {
+      SDL_RenderSetLogicalSize(m_renderer, width, height);
+    }
+  }
 
 private:
   SDL_Window* m_window{ nullptr };
