@@ -45,6 +45,8 @@ public:
       return false;
     }
 
+    m_screenWidth = width;
+    m_screenHeight = height;
     return true;
   }
 
@@ -123,12 +125,21 @@ public:
     if (m_renderer) {
       SDL_RenderSetLogicalSize(m_renderer, width, height);
     }
+
+    m_screenWidth = width;
+    m_screenHeight = height;
   }
+
+  int getScreenWidth() const { return m_screenWidth; }
+  int getScreenHeight() const { return m_screenHeight; }
 
 private:
   SDL_Window* m_window{ nullptr };
   SDL_Renderer* m_renderer{ nullptr };
   TTF_Font* m_font{ nullptr };
+
+  int m_screenWidth{ 0 };
+  int m_screenHeight{ 0 };
 
   int m_fontW{ 0 };
   int m_fontH{ 0 };

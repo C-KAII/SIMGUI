@@ -20,7 +20,6 @@ private:
   void imguiFinish();
 
   void render();
-  void renderDebugGrid();
 
   Renderer m_renderer{ };
 

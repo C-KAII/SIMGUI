@@ -17,5 +17,5 @@ public:
 private:
   SDL_Color m_color{ 255 };
   std::function<void()> m_onClick;
-  bool clicked{ false };
+  bool m_clicked{ false };
 };

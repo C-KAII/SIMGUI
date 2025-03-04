@@ -67,6 +67,7 @@ public:
 
     m_rowMaxHeights.clear();
     m_rowMaxHeights.push_back(0);
+    m_gridWidth = m_xOffset;
 
     for (auto& widget : m_widgets) {
       SDL_Rect rect = widget->getRect();
@@ -80,6 +81,7 @@ public:
         colCount++;
         if (colCount >= m_columns) {
           colCount = 0;
+          m_gridWidth = std::max(m_gridWidth, currentX + rect.w + m_padding);
           currentX = m_xOffset;
           currentY += m_rowMaxHeights[rowCount] + m_padding;
           rowCount++;
@@ -87,12 +89,27 @@ public:
           currentX += rect.w + m_padding;
         }
     }
+
+    if (colCount != 0 && m_columns != 1) {
+      m_gridWidth = std::max(m_gridWidth, currentX + m_widgets.back()->getRect().w + m_padding);
+    }
+    calcGridHeight();
     m_needsUpdate = false;
   }
 
   std::vector<std::unique_ptr<Widget>>& getWidgets() { return m_widgets; }
 
+  int getGridWidth() const { return m_gridWidth; }
+  int getGridHeight() const { return m_gridHeight; }
+
 private:
+  void calcGridHeight() {
+    m_gridHeight = m_yOffset;
+    for (auto& h : m_rowMaxHeights) {
+      m_gridHeight += h + m_padding;
+    }
+  }
+
   int m_xOffset;
   int m_yOffset;
   int m_padding;
@@ -100,6 +117,8 @@ private:
 
   int m_columns{ 2 };
   std::vector<int> m_rowMaxHeights{ 0 };
+  int m_gridWidth{ 0 };
+  int m_gridHeight{ 0 };
 
   std::vector<std::unique_ptr<Widget>> m_widgets;
 };

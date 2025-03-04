@@ -3,6 +3,7 @@
 #include "LayoutManager.h"
 #include <vector>
 #include <memory>
+#include <algorithm>
 
 struct UIState {
   UIState() = default;
@@ -12,18 +13,19 @@ struct UIState {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
       switch (event.type) {
+
       case SDL_MOUSEMOTION:
-        mouseX = event.motion.x;
-        mouseY = event.motion.y;
+        mouseX = event.motion.x - scrollX;
+        mouseY = event.motion.y - scrollY;
         if (debugMode && draggingWidget) {
-          int newX = event.motion.x - dragOffset.x;
-          int newY = event.motion.y - dragOffset.y;
-          draggingWidget->setPosition(newX, newY);
+          draggingWidget->setPosition(mouseX - dragOffset.x, mouseY - dragOffset.y);
         }
         break;
 
       case SDL_MOUSEBUTTONDOWN:
         if (event.button.button == SDL_BUTTON_LEFT) {
+          buttonX = event.button.x - scrollX;
+          buttonY = event.button.y - scrollY;
           mouseDown = true;
 
           if (debugMode) {
@@ -31,12 +33,12 @@ struct UIState {
             for (auto& widget : layout.getWidgets()) {
               SDL_Rect rect = widget->getRect();
               if (
-                event.button.x >= rect.x && event.button.x < rect.x + rect.w &&
-                event.button.y >= rect.y && event.button.y < rect.y + rect.h
+                buttonX >= rect.x && buttonX < rect.x + rect.w &&
+                buttonY >= rect.y && buttonY < rect.y + rect.h
                 ) {
                 draggingWidget = widget.get();
-                dragOffset.x = event.button.x - rect.x;
-                dragOffset.y = event.button.y - rect.y;
+                dragOffset.x = buttonX - rect.x;
+                dragOffset.y = buttonY - rect.y;
                 break;
               }
             }
@@ -46,6 +48,8 @@ struct UIState {
 
       case SDL_MOUSEBUTTONUP:
         if (event.button.button == SDL_BUTTON_LEFT) {
+          buttonX = event.button.x - scrollX;
+          buttonY = event.button.y - scrollY;
           mouseDown = false;
 
           bool flag = false;
@@ -70,8 +74,8 @@ struct UIState {
               // Ignore dragged widget
               if (widget.get() == draggingWidget) { continue; }
               if (
-                event.button.x >= rect.x - (padding / 2) && event.button.x < rect.x + rect.w + (padding / 2) &&
-                event.button.y >= rect.y - (padding / 2) && event.button.y < rect.y + rect.h + (padding / 2)
+                buttonX >= rect.x - (padding / 2) && buttonX < rect.x + rect.w + (padding / 2) &&
+                buttonY >= rect.y - (padding / 2) && buttonY < rect.y + rect.h + (padding / 2)
                 ) {
                 dropTarget = widget.get();
                 // If mouse is on LHS, insert before
@@ -91,6 +95,22 @@ struct UIState {
         }
         break;
 
+      case SDL_MOUSEWHEEL:
+        if (event.wheel.y > 0 && !(keyMod & KMOD_SHIFT)) {
+          scrollY += 5; // Scroll up
+        } else if (event.wheel.y < 0 && !(keyMod & KMOD_SHIFT)) {
+          scrollY -= 5; // Scroll down
+        }
+
+        if (event.wheel.x > 0 || (keyMod & KMOD_SHIFT && event.wheel.y > 0)) {
+          scrollX += 5; // Scroll left
+        } else if (event.wheel.x < 0 || (keyMod & KMOD_SHIFT && event.wheel.y < 0)) {
+          scrollX -= 5; // Scroll right
+        }
+
+        clampScrolling(layout, renderer);
+        break;
+
       case SDL_KEYDOWN:
         keyEntered = event.key.keysym.sym;
         keyMod = event.key.keysym.mod;
@@ -100,8 +120,8 @@ struct UIState {
           keyEntered = 0;
         }
 
-        if (event.key.keysym.sym == SDLK_LCTRL || event.key.keysym.sym == SDLK_RCTRL) {
-          debugMode = true;
+        if (event.key.keysym.sym == SDLK_F1) {
+          debugMode = !debugMode;
         }
         break;
 
@@ -110,9 +130,7 @@ struct UIState {
           return false;
         }
 
-        if (event.key.keysym.sym == SDLK_LCTRL || event.key.keysym.sym == SDLK_RCTRL) {
-          debugMode = false;
-        }
+        keyMod = 0;
         break;
 
       case SDL_WINDOWEVENT:
@@ -151,8 +169,24 @@ struct UIState {
     return true;
   }
 
+  void clampScrolling(const LayoutManager& layout, const Renderer& renderer) {
+    scrollX = std::clamp(
+      scrollX,
+      std::min(0, -(layout.getGridWidth() - renderer.getScreenWidth()) - 210),
+      0
+    );
+
+    scrollY = std::clamp(
+      scrollY,
+      std::min(0, -(layout.getGridHeight() - renderer.getScreenHeight()) - 210),
+      0
+    );
+  }
+
   int mouseX{ 0 };
   int mouseY{ 0 };
+  int buttonX{ 0 };
+  int buttonY{ 0 };
   bool mouseDown{ false };
 
   int hotItem{ 0 };
@@ -163,10 +197,12 @@ struct UIState {
   int keyEntered{ 0 };
   int keyMod{ 0 };
 
-  bool needsUpdate{ false };
+  bool needsUpdate{ true };
 
   bool debugMode{ false };
   Widget* draggingWidget{ nullptr };
   SDL_Point dragOffset{ 0,0 };
 
+  int scrollX{ 0 };
+  int scrollY{ 0 };
 };

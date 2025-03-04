@@ -12,11 +12,8 @@
 #define GEN_ID (__LINE__)
 #endif
 
-constexpr int SCREEN_WIDTH = 1080;
-constexpr int SCREEN_HEIGHT = 720;
-
 bool App::init() {
-  if (!m_renderer.init("SIMGUI", SCREEN_WIDTH, SCREEN_HEIGHT)) {
+  if (!m_renderer.init("SIMGUI", 640, 480)) {
     return false;
   }
 
@@ -32,13 +29,13 @@ void App::run() {
 
   m_running = true;
   while (m_running) {
+    render();
     m_running = m_uiState.handleEvents(m_layout, m_renderer);
 
     if (m_layout.needsUpdate() || m_uiState.needsUpdate) {
       m_layout.applyLayout();
       m_uiState.needsUpdate = false;
     }
-    render();
   }
 }
 
@@ -91,11 +88,122 @@ void App::addWidgets() {
   ));
 
   // Sliders
-  m_layout.addWidget(std::make_unique<Slider>(GEN_ID, 0, 0, 16, 100, 0, 255, m_redValue));
-  m_layout.addWidget(std::make_unique<Slider>(GEN_ID, 0, 0, 16, 100, 0, 255, m_greenValue));
-  m_layout.addWidget(std::make_unique<Slider>(GEN_ID, 0, 0, 16, 100, 0, 255, m_blueValue));
+  //m_layout.addWidget(std::make_unique<Slider>(GEN_ID, 0, 0, 16, 100, 0, 255, m_redValue));
+  //m_layout.addWidget(std::make_unique<Slider>(GEN_ID, 0, 0, 16, 100, 0, 255, m_greenValue));
+  //m_layout.addWidget(std::make_unique<Slider>(GEN_ID, 0, 0, 16, 100, 0, 255, m_blueValue));
 
   // Text Fields
+  m_layout.addWidget(std::make_unique<TextField>(GEN_ID, 0, 0, 200, m_renderer.getFontHeight()));
+  m_layout.addWidget(std::make_unique<TextField>(GEN_ID, 0, 0, 200, m_renderer.getFontHeight()));
+
+  // Buttons
+  m_layout.addWidget(std::make_unique<Button>(
+    GEN_ID, 0, 0, 100, 50,
+    SDL_Color{ 0, 0, 255, 255 },
+    [this]() {
+      std::cout << "Blue button clicked!\n";
+      int numCols = m_layout.getNumColumns() - 1;
+      if (numCols >= 1) {
+        m_layout.setNumColumns(numCols);
+      }
+    }
+  ));
+
+  m_layout.addWidget(std::make_unique<Button>(
+    GEN_ID, 0, 0, 100, 50,
+    SDL_Color{ 0, 255, 0, 255 },
+    [this]() {
+      std::cout << "Green button clicked!\n";
+      int numCols = m_layout.getNumColumns() + 1;
+      if (numCols <= m_layout.getNumWidgets()) {
+        m_layout.setNumColumns(numCols);
+      }
+    }
+  ));
+
+  m_layout.addWidget(std::make_unique<Button>(
+    GEN_ID, 0, 0, 100, 50,
+    SDL_Color{ 255, 204, 255, 255 },
+    [this]() {
+      std::cout << "Pink button clicked!\n";
+      m_redValue = rand() % 256;
+      m_greenValue = rand() % 256;
+      m_blueValue = rand() % 256;
+    }
+  ));
+
+  m_layout.addWidget(std::make_unique<Button>(
+    GEN_ID, 0, 0, 100, 50,
+    SDL_Color{ 102, 255, 255, 255 },
+    [this]() {
+      std::cout << "Cyan button clicked!\n";
+      m_running = false; // quit
+    }
+  ));
+
+  // Sliders
+  //m_layout.addWidget(std::make_unique<Slider>(GEN_ID, 0, 0, 16, 100, 0, 255, m_redValue));
+  //m_layout.addWidget(std::make_unique<Slider>(GEN_ID, 0, 0, 16, 100, 0, 255, m_greenValue));
+  //m_layout.addWidget(std::make_unique<Slider>(GEN_ID, 0, 0, 16, 100, 0, 255, m_blueValue));
+
+  // Text Fields
+  m_layout.addWidget(std::make_unique<TextField>(GEN_ID, 0, 0, 200, m_renderer.getFontHeight()));
+  m_layout.addWidget(std::make_unique<TextField>(GEN_ID, 0, 0, 200, m_renderer.getFontHeight()));
+
+  // Buttons
+  m_layout.addWidget(std::make_unique<Button>(
+    GEN_ID, 0, 0, 100, 50,
+    SDL_Color{ 0, 0, 255, 255 },
+    [this]() {
+      std::cout << "Blue button clicked!\n";
+      int numCols = m_layout.getNumColumns() - 1;
+      if (numCols >= 1) {
+        m_layout.setNumColumns(numCols);
+      }
+    }
+  ));
+
+  m_layout.addWidget(std::make_unique<Button>(
+    GEN_ID, 0, 0, 100, 50,
+    SDL_Color{ 0, 255, 0, 255 },
+    [this]() {
+      std::cout << "Green button clicked!\n";
+      int numCols = m_layout.getNumColumns() + 1;
+      if (numCols <= m_layout.getNumWidgets()) {
+        m_layout.setNumColumns(numCols);
+      }
+    }
+  ));
+
+  m_layout.addWidget(std::make_unique<Button>(
+    GEN_ID, 0, 0, 100, 50,
+    SDL_Color{ 255, 204, 255, 255 },
+    [this]() {
+      std::cout << "Pink button clicked!\n";
+      m_redValue = rand() % 256;
+      m_greenValue = rand() % 256;
+      m_blueValue = rand() % 256;
+    }
+  ));
+
+  m_layout.addWidget(std::make_unique<Button>(
+    GEN_ID, 0, 0, 100, 50,
+    SDL_Color{ 102, 255, 255, 255 },
+    [this]() {
+      std::cout << "Cyan button clicked!\n";
+      m_running = false; // quit
+    }
+  ));
+
+  // Sliders
+  //m_layout.addWidget(std::make_unique<Slider>(GEN_ID, 0, 0, 16, 100, 0, 255, m_redValue));
+  //m_layout.addWidget(std::make_unique<Slider>(GEN_ID, 0, 0, 16, 100, 0, 255, m_greenValue));
+  //m_layout.addWidget(std::make_unique<Slider>(GEN_ID, 0, 0, 16, 100, 0, 255, m_blueValue));
+
+  // Text Fields
+  m_layout.addWidget(std::make_unique<TextField>(GEN_ID, 0, 0, 200, m_renderer.getFontHeight()));
+  m_layout.addWidget(std::make_unique<TextField>(GEN_ID, 0, 0, 200, m_renderer.getFontHeight()));
+
   m_layout.addWidget(std::make_unique<TextField>(GEN_ID, 0, 0, 200, m_renderer.getFontHeight()));
   m_layout.addWidget(std::make_unique<TextField>(GEN_ID, 0, 0, 200, m_renderer.getFontHeight()));
 
@@ -126,49 +234,40 @@ void App::render() {
 
   imguiPrepare();
 
-  if (m_uiState.debugMode) {
-    //renderDebugGrid();
-    for (auto& widget : m_layout.getWidgets()) {
-      widget->renderDebug(m_renderer);
-    }
+  // Widget rendering
 
-  } else {
-    for (auto& widget : m_layout.getWidgets()) {
-      widget->update(m_renderer, m_uiState);
-      widget->render(m_renderer, m_uiState);
+  for (auto& widget : m_layout.getWidgets()) {
+    widget->update(m_renderer, m_uiState);
+
+    // Offset rendering based on scroll position
+    SDL_Rect rect = widget->getRect();
+    if (
+      rect.x + rect.w + m_uiState.scrollX > 0 && rect.y + rect.h + m_uiState.scrollY > 0 &&
+      rect.x + m_uiState.scrollX < m_renderer.getScreenWidth() && rect.y + m_uiState.scrollY < m_renderer.getScreenHeight()
+      ) {
+      if (m_uiState.debugMode) {
+        widget->renderDebug(m_renderer, m_uiState.scrollX, m_uiState.scrollY, m_uiState.hotItem);
+      } else {
+        widget->render(m_renderer, m_uiState);
+      }
     }
+  }
+
+  // Non-widget rendering
+
+  if (m_uiState.debugMode) {
+    // TODO - move this and other debug rending logic to a debug rendering class
+
+    // Mouse position
+    std::string mousePosText = "(" + std::to_string(m_uiState.mouseX) + ", " + std::to_string(m_uiState.mouseY) + ")";
+    m_renderer.drawText(mousePosText, m_uiState.mouseX + m_uiState.scrollX, m_uiState.mouseY + m_uiState.scrollY - m_renderer.getFontHeight(), {0, 0, 0, 255});
+
+
   }
 
   imguiFinish();
 
   m_renderer.present();
+
   SDL_Delay(10);
 }
-
-//void App::renderDebugGrid() {
-//  int cols = m_layout.getNumColumns();
-//  int row = 0;
-//  int padding = 4;
-//
-//  const auto& widgets = m_layout.getWidgets();
-//  for (int i = 0; i < widgets.size(); i++) {
-//    SDL_Rect rect = widgets[i]->getRect();
-//
-//    // Tile border
-//    m_renderer.drawRect(
-//      rect.x - (padding / 2), rect.y - (padding / 2),
-//      rect.w + padding, m_layout.getRowHeight(row) + padding,
-//      { 0, 0, 0, 100 }
-//    );
-//    // Tile
-//    m_renderer.drawRect(
-//      rect.x - (padding / 4), rect.y - (padding / 4),
-//      rect.w + (padding / 2), m_layout.getRowHeight(row) + (padding / 2),
-//      { 0, 255, 0, 100 }
-//    );
-//
-//    if (i - (row * cols) == cols - 1) {
-//      row++;
-//    }
-//  }
-//}

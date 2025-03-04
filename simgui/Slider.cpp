@@ -48,11 +48,17 @@ void Slider::update(Renderer& renderer, UIState& uiState) {
     }
   }
 
+  uiState.lastWidget = m_id;
+
+  if (uiState.debugMode) {
+    return; // No need to process rest of update
+  }
+
   // Mouse drag logic
   if (uiState.activeItem == m_id) {
     int mousePos = uiState.mouseY - (m_y + 8);
-    if (mousePos < 0) mousePos = 0;
-    if (mousePos > m_height - m_width) mousePos = m_height - m_width;
+    if (mousePos < 0) { mousePos = 0; }
+    if (mousePos > m_height - m_width) { mousePos = m_height - m_width; }
 
     int newValue = (mousePos * m_maxValue) / (m_height - m_width);
     if (newValue != m_value) {
@@ -62,22 +68,20 @@ void Slider::update(Renderer& renderer, UIState& uiState) {
 
   if (m_value < m_minValue) { m_value = m_minValue; }
   if (m_value > m_maxValue) { m_value = m_maxValue; }
-
-  uiState.lastWidget = m_id;
 }
 
 void Slider::render(Renderer& renderer, const UIState& uiState) {
   // If we have keyboard focus, show it
   if (uiState.kbdItem == m_id) {
     renderer.drawRect(
-      m_x - OUTLINE_PADDING, m_y - OUTLINE_PADDING,
+      m_x + uiState.scrollX - OUTLINE_PADDING, m_y + uiState.scrollY - OUTLINE_PADDING,
       m_width + (OUTLINE_PADDING * 2), m_height + (OUTLINE_PADDING * 2),
       { 255, 0, 0, 255 }
     );
   }
 
   // Draw slider track
-  renderer.drawRect(m_x, m_y, m_width, m_height, { 117, 117, 117, 255 });
+  renderer.drawRect(m_x + uiState.scrollX, m_y + uiState.scrollY, m_width, m_height, { 117, 117, 117, 255 });
 
   // Handle color
   SDL_Color sliderColor = { 170, 170, 170, 255 };
@@ -86,5 +90,5 @@ void Slider::render(Renderer& renderer, const UIState& uiState) {
   }
   // Draw slider handle
   int yPos = (m_height - m_width) * m_value / m_maxValue;
-  renderer.drawRect(m_x, m_y + yPos, m_width, m_width, sliderColor);
+  renderer.drawRect(m_x + uiState.scrollX, m_y + uiState.scrollY + yPos, m_width, m_width, sliderColor);
 }
