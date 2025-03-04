@@ -1,12 +1,13 @@
 // TextField.cpp
 #include "TextField.h"
 
-TextField::TextField(int id, int x, int y, int width, int height) {
+TextField::TextField(int id, int x, int y, int width, int height, SDL_Color color) {
   m_id = id;
   m_x = x;
   m_y = y;
   m_width = width;
   m_height = height;
+  m_color = color;
   m_lines.push_back("");
 }
 
@@ -124,7 +125,7 @@ void TextField::render(Renderer& renderer, const UIState& uiState) {
   }
 
   // Draw field background
-  SDL_Color bgColor = { 170, 170, 170, 255 };  // Default grey
+  SDL_Color bgColor = m_color;
   if (uiState.hotItem == m_id) {
     bgColor = { 255, 255, 255, 255 };  // Lighter when active
   }

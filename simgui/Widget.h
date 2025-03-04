@@ -12,7 +12,11 @@ public:
   Widget() = default;
   virtual ~Widget() = default;
 
+  int getId() const { return m_id; }
+
   SDL_Rect getRect() { return { m_x, m_y, m_width, m_height }; }
+
+  SDL_Color getColor() const { return m_color; }
 
   void setPosition(int x, int y) {
     m_x = x;
@@ -41,20 +45,11 @@ public:
   virtual void update(Renderer& renderer, UIState& uiState) = 0;
   virtual void render(Renderer& renderer, const UIState& uiState) = 0;
 
-  void renderDebug(Renderer& renderer, int offsetX, int offsetY, int hotItemId) const {
-    renderer.drawRect(m_x + offsetX, m_y + offsetY, m_width, m_height, { 255, 255, 255, 50 });
-    renderer.drawText(std::to_string(m_id), m_x + offsetX + 2, m_y + offsetY + 2, { 0, 0, 0, 255 });
-
-    if (hotItemId == m_id) {
-      renderer.drawRect(m_x + offsetX + m_width + 10, m_y + offsetY, 200, 200, { 190, 190, 190, 255 });
-
-    }
-  }
-
 protected:
   int m_id{ 0 };
   int m_x{ 0 };
   int m_y{ 0 };
   int m_width{ 0 };
   int m_height{ 0 };
+  SDL_Color m_color{ 255 };
 };

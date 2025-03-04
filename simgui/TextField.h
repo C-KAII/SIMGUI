@@ -9,7 +9,7 @@
 
 class TextField : public Widget {
 public:
-  TextField(int id, int x, int y, int width, int height);
+  TextField(int id, int x, int y, int width, int height, SDL_Color color = SDL_Color{ 170, 170, 170, 255 });
   ~TextField() override = default;
 
   void update(Renderer& renderer, UIState& uiState) override;

@@ -1,13 +1,14 @@
 // Button.cpp
 #include "Button.h"
 
-Button::Button(int id, int x, int y, int width, int height, SDL_Color color, std::function<void()> onClick)
-  : m_color(color), m_onClick(onClick) {
+Button::Button(int id, int x, int y, int width, int height, std::function<void()> onClick, SDL_Color color)
+  : m_onClick(onClick) {
   m_id = id;
   m_x = x;
   m_y = y;
   m_width = width;
   m_height = height;
+  m_color = color;
 }
 
 void Button::update(Renderer& renderer, UIState& uiState) {

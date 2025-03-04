@@ -1,13 +1,14 @@
 // Button.cpp
 #include "Slider.h"
 
-Slider::Slider(int id, int x, int y, int width, int height, int minValue, int maxValue, int& valueRef)
+Slider::Slider(int id, int x, int y, int width, int height, int minValue, int maxValue, int& valueRef, SDL_Color color)
   : m_minValue(minValue), m_maxValue(maxValue), m_value(valueRef) {
   m_id = id;
   m_x = x;
   m_y = y;
   m_width = width;
   m_height = height;
+  m_color = color;
 }
 
 void Slider::update(Renderer& renderer, UIState& uiState) {
@@ -81,7 +82,7 @@ void Slider::render(Renderer& renderer, const UIState& uiState) {
   }
 
   // Draw slider track
-  renderer.drawRect(m_x + uiState.scrollX, m_y + uiState.scrollY, m_width, m_height, { 117, 117, 117, 255 });
+  renderer.drawRect(m_x + uiState.scrollX, m_y + uiState.scrollY, m_width, m_height, m_color);
 
   // Handle color
   SDL_Color sliderColor = { 170, 170, 170, 255 };

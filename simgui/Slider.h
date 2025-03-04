@@ -7,7 +7,7 @@
 
 class Slider : public Widget {
 public:
-  Slider(int id, int x, int y, int width, int height, int minValue, int maxValue, int& valueRef);
+  Slider(int id, int x, int y, int width, int height, int minValue, int maxValue, int& valueRef, SDL_Color color = SDL_Color{ 117, 117, 117, 255 });
   ~Slider() override = default;
 
   void update(Renderer& renderer, UIState& uiState) override;
